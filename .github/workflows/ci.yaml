@@ -17,6 +17,14 @@ jobs:
     steps:
       - name: 🛎️ Configurar el entorno
         run: apt update && apt install -y lsb-release curl sudo
+        
+      - name: 🕒 Configurar zona horaria automáticamente
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          sudo ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
+          sudo apt-get update && sudo apt-get install -y tzdata
+          sudo dpkg-reconfigure --frontend noninteractive tzdata
+
 
       - name: 📥 Instalar ROS 2 Humble
         run: |
