@@ -1,7 +1,12 @@
 # UJIROBOTICS_ERC2025
 
 ## Pending tasks
-- [ ] Investigar integración continua en el repositorio.
+- [X] Integración continua en el repositorio. 
+- [ ] Implementar programas
+- [ ] Implementar ZED
+- [ ] Implementar Realsense
+- [ ] Implementar lidar 4D
+- [ ] Implementar scripts
 
 ## Estructura provisional
 
@@ -57,5 +62,6 @@
 |   ├── requirements.txt        # Dependencias de Python
 │  
 ├── .gitignore                   # Archivos a ignorar en Git
+├── .github/workflows            # Integración continua en el repositorio. (Compila y prueba los commits antes de hacer push)
 ├── README.md                    # Información general del repositorio
 └── LICENSE                      # Licencia del código
