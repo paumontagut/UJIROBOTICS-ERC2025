@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 package_name = 'vision'
 
 setup(
-    name=package_name,
+    name=package_name,ñ
     version='0.0.0',
     packages=find_packages(exclude=['test']),
     data_files=[
@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'vision_node = vision.vision_node:main',
+
         ],
     },
 )
