@@ -15,7 +15,7 @@ jobs:
       image: ubuntu:22.04
 
     steps:
-      - name: 🛎️ Configurar el entorno
+      - name: 🏢 Configurar el entorno
         run: apt update && apt install -y lsb-release curl sudo
         
       - name: 🕒 Configurar zona horaria automáticamente
@@ -24,7 +24,6 @@ jobs:
           sudo ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
           sudo apt-get update && sudo apt-get install -y tzdata
           sudo dpkg-reconfigure --frontend noninteractive tzdata
-
 
       - name: 📥 Instalar ROS 2 Humble
         run: |
@@ -37,26 +36,19 @@ jobs:
           
       - name: 🔄 Inicializar `rosdep`
         run: |
-          . /opt/ros/humble/setup.bash
-          sudo rosdep init
-          rosdep update
+          bash -c "source /opt/ros/humble/setup.bash && sudo rosdep init && rosdep update"
 
       - name: 📂 Clonar el repositorio
         uses: actions/checkout@v3
 
-      - name: 🏗️ Configurar el workspace
+      - name: 🏰 Configurar el workspace
         run: |
-          . /opt/ros/humble/setup.bash
-          mkdir -p erc2025_ws/src
-          mv $(ls -A | grep -v erc2025_ws) erc2025_ws/src/
-          cd erc2025_ws && rosdep update && rosdep install --from-paths src --ignore-src -r -y
+          bash -c "source /opt/ros/humble/setup.bash && mkdir -p erc2025_ws/src && mv $(ls -A | grep -v erc2025_ws) erc2025_ws/src/ && cd erc2025_ws && rosdep update && rosdep install --from-paths src --ignore-src -r -y"
 
       - name: 🔨 Compilar con colcon
         run: |
-          . /opt/ros/humble/setup.bash
-          cd erc2025_ws && colcon build --event-handlers console_cohesion+
+          bash -c "source /opt/ros/humble/setup.bash && cd erc2025_ws && colcon build --event-handlers console_cohesion+"
 
-      - name: 🧪 Ejecutar pruebas
+      - name: 🧠 Ejecutar pruebas
         run: |
-          . /opt/ros/humble/setup.bash
-          cd erc2025_ws && colcon test --event-handlers console_cohesion+
+          bash -c "source /opt/ros/humble/setup.bash && cd erc2025_ws && colcon test --event-handlers console_cohesion+"
