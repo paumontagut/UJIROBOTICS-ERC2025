@@ -1,0 +1,47 @@
+name: ROS 2 CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:22.04
+
+    steps:
+      - name: 🛎️ Configurar el entorno
+        run: apt update && apt install -y lsb-release curl sudo
+
+      - name: 📥 Instalar ROS 2 Humble
+        run: |
+          sudo apt update && sudo apt install -y software-properties-common
+          sudo add-apt-repository universe
+          sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo apt-key add -
+          sudo apt-add-repository http://packages.ros.org/ros2/ubuntu
+          sudo apt update
+          sudo apt install -y ros-humble-desktop
+
+      - name: 📂 Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: 🏗️ Configurar el workspace
+        run: |
+          mkdir -p colcon_ws/src
+          mv $(ls -A | grep -v colcon_ws) colcon_ws/src/
+          cd colcon_ws && rosdep update && rosdep install --from-paths src --ignore-src -r -y
+
+      - name: 🔨 Compilar con colcon
+        run: |
+          source /opt/ros/humble/setup.bash
+          cd erc2025_ws && colcon build --event-handlers console_cohesion+
+
+      - name: 🧪 Ejecutar pruebas
+        run: |
+          source /opt/ros/humble/setup.bash
+          cd erc2025_ws && colcon test --event-handlers console_cohesion+
