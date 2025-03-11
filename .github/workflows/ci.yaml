@@ -15,17 +15,25 @@ jobs:
       image: ubuntu:22.04
 
     steps:
-      - name: 🏢 Configurar el entorno
+      - name: 🏢 Configure environment
         run: apt update && apt install -y lsb-release curl sudo
         
-      - name: 🕒 Configurar zona horaria automáticamente
+      - name: 🕒 Set timezone non-interactively
         run: |
           export DEBIAN_FRONTEND=noninteractive
           sudo ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
           sudo apt-get update && sudo apt-get install -y tzdata
           sudo dpkg-reconfigure --frontend noninteractive tzdata
 
-      - name: 📥 Instalar ROS 2 Humble
+      - name: 📥 Cache APT packages (ROS 2 & dependencies)
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/apt/archives
+          key: apt-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yaml') }}
+          restore-keys: |
+            apt-${{ runner.os }}-
+
+      - name: 📥 Install ROS 2 Humble
         run: |
           sudo apt update && sudo apt install -y software-properties-common
           sudo add-apt-repository universe
@@ -34,14 +42,14 @@ jobs:
           sudo apt update
           sudo apt install -y ros-humble-ros-base python3-colcon-common-extensions python3-rosdep
           
-      - name: 🔄 Inicializar `rosdep`
+      - name: 🔄 Initialize rosdep
         run: |
           bash -c "source /opt/ros/humble/setup.bash && sudo rosdep init && rosdep update"
 
-      - name: 📂 Clonar el repositorio
+      - name: 📂 Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🏰 Configurar el workspace
+      - name: 🏰 Setup workspace
         run: |
           bash -e <<EOF
           source /opt/ros/humble/setup.bash
@@ -53,10 +61,10 @@ jobs:
           rosdep install --from-paths src --ignore-src -r -y
           EOF
 
-      - name: 🔨 Compilar con colcon
+      - name: 🔨 Build with colcon
         run: |
           bash -c "source /opt/ros/humble/setup.bash && cd erc2025_ws && colcon build --event-handlers console_cohesion+"
 
-      - name: 🧠 Ejecutar pruebas
+      - name: 🧠 Run tests
         run: |
           bash -c "source /opt/ros/humble/setup.bash && cd erc2025_ws && colcon test --event-handlers console_cohesion+"
