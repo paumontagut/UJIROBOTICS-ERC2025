@@ -43,7 +43,15 @@ jobs:
 
       - name: 🏰 Configurar el workspace
         run: |
-          bash -c "source /opt/ros/humble/setup.bash && mkdir -p erc2025_ws/src && shopt -s extglob && mv !(erc2025_ws|.github) erc2025_ws/src/ && cd erc2025_ws && rosdep update && rosdep install --from-paths src --ignore-src -r -y"
+          bash -e <<EOF
+          source /opt/ros/humble/setup.bash
+          mkdir -p erc2025_ws/src
+          shopt -s extglob
+          mv -- !(erc2025_ws|.github) erc2025_ws/src/
+          cd erc2025_ws
+          rosdep update
+          rosdep install --from-paths src --ignore-src -r -y
+          EOF
 
       - name: 🔨 Compilar con colcon
         run: |
