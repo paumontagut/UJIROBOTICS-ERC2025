@@ -37,7 +37,7 @@ jobs:
           
       - name: 🔄 Inicializar `rosdep`
         run: |
-          source /opt/ros/humble/setup.bash
+          . /opt/ros/humble/setup.bash
           sudo rosdep init
           rosdep update
 
@@ -46,17 +46,17 @@ jobs:
 
       - name: 🏗️ Configurar el workspace
         run: |
-          source /opt/ros/humble/setup.bash
+          . /opt/ros/humble/setup.bash
           mkdir -p erc2025_ws/src
           mv $(ls -A | grep -v erc2025_ws) erc2025_ws/src/
           cd erc2025_ws && rosdep update && rosdep install --from-paths src --ignore-src -r -y
 
       - name: 🔨 Compilar con colcon
         run: |
-          source /opt/ros/humble/setup.bash
+          . /opt/ros/humble/setup.bash
           cd erc2025_ws && colcon build --event-handlers console_cohesion+
 
       - name: 🧪 Ejecutar pruebas
         run: |
-          source /opt/ros/humble/setup.bash
+          . /opt/ros/humble/setup.bash
           cd erc2025_ws && colcon test --event-handlers console_cohesion+
