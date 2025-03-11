@@ -33,13 +33,20 @@ jobs:
           sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo apt-key add -
           sudo apt-add-repository http://packages.ros.org/ros2/ubuntu
           sudo apt update
-          sudo apt install -y ros-humble-desktop
+          sudo apt install -y ros-humble-ros-base python3-colcon-common-extensions python3-rosdep
+          
+      - name: 🔄 Inicializar `rosdep`
+        run: |
+          source /opt/ros/humble/setup.bash
+          sudo rosdep init
+          rosdep update
 
       - name: 📂 Clonar el repositorio
         uses: actions/checkout@v3
 
       - name: 🏗️ Configurar el workspace
         run: |
+          source /opt/ros/humble/setup.bash
           mkdir -p colcon_ws/src
           mv $(ls -A | grep -v colcon_ws) colcon_ws/src/
           cd colcon_ws && rosdep update && rosdep install --from-paths src --ignore-src -r -y
